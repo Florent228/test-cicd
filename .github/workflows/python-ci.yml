@@ -38,7 +38,7 @@ jobs:
         git config --global user.name 'github-actions[bot]'
         git config --global user.email 'github-actions[bot]@users.noreply.github.com'
         git checkout master
-        git merge dev
+        git merge --ff-only dev
         git push origin master
 
   create-failure-branch:
@@ -47,12 +47,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-      with:
-        ref: 'dev'
     - name: Create Failure Branch
+      env:
+        ACCESS_TOKEN: ${{ secrets.MY_PAT }}
       run: |
         git config --global user.name 'github-actions[bot]'
         git config --global user.email 'github-actions[bot]@users.noreply.github.com'
         FAILURE_BRANCH="failure-$(date +%Y-%m-%d-%H-%M-%S)"
         git checkout -b $FAILURE_BRANCH
-        git push origin $FAILURE_BRANCH
+        git push --force https://${ACCESS_TOKEN}@github.com/${{ github.repository }} $FAILURE_BRANCH
